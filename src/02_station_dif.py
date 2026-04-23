@@ -19,8 +19,9 @@ from glob import glob as gb
 # ============================================================
 
 # Experimentos a evaluar usando archivos creados con el script 01_ordena_wrf_files.py
-EXPERIMENTOS = [e.split("/")[-1].split("_")[0] for e in gb("../data/nc_files/*t2m.png")]  #['EXP0', 'EXP1']
-
+files_experimentos = gb("../data/nc_files/*t2m_d02_dy.nc")
+EXPERIMENTOS = [e.split("/")[-1].split("_")[0] for e in files_experimentos]  #['EXP0', 'EXP1']
+print(EXPERIMENTOS)
 # Rutas de datos
 RUTA_CSV = '../input_csv'          # Observaciones estacionales
 RUTA_NC = '../data/nc_files'       # Salidas WRF procesadas
@@ -87,7 +88,7 @@ def main():
         
         # Extraer cada experimento y calcular bias
         for exp in EXPERIMENTOS:
-            patron = f"{RUTA_NC}/{exp}*{variable}*.nc"
+            patron = f"{RUTA_NC}/{exp}_*{variable}*.nc"
             archivo_mod = gb(patron)[0]
             
             print(f"  {exp}: {os.path.basename(archivo_mod)}")

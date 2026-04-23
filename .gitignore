@@ -3,7 +3,7 @@
 *nc
 
 # figuras generadas — opcional
-# figures/
+src/antes/
 
 # archivos temporales Python
 __pycache__/

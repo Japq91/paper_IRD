@@ -36,7 +36,7 @@ m = META[VAR]
 # ─── rótulos dos experimentos ─────────────────────────────────────────────────
 ############################################################
 EXP_IDS = [f'EXP{i}' for i in range(11)] + ['boxplot']
-
+print(EXP_IDS)
 EXP_LABELS_boxplot = ['GMTs\nMOD30\nSOM',  'GMTns\nMOD30\nnSOM', 'SRTs\nMOD30\nSOM', 'SRTns\nMOD30\nSOM', 
               'GMTns\nMOD15\nSOM',  'GMTns\nEVA\nSOM', 'GMTns\nEVA\nTRO',   'GMTns\nEVA\nCON',    
               'GMTns\nEVA\nSIE', 'GMTns\nEVA\nMAM',   'GMTns\nEVA\nSIE_SST','BOXPLOTS',]

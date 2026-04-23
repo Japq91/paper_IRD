@@ -150,6 +150,6 @@ def plot_boxplot_panel(ax, root, var, exp_labels):
     ax.set_ylabel(None)
     ax.yaxis.tick_right()
     #ax.set_aspect(4.8 / 10 if 't' in var else 4 / 18) # TAMAÑO DE PANEL BOXPLOT
-    ax.set_aspect(4.8 / 10 if 't' in var else 7 / 18) # TAMAÑO DE PANEL BOXPLOT
+    #ax.set_aspect(4.8 / 10 if 't' in var else 7 / 18) # TAMAÑO DE PANEL BOXPLOT
     ax.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0, title='STATION')
     ax.grid(True)
