@@ -16,41 +16,40 @@ import matplotlib.colors as mcolors
 import numpy as np
 
 # ============================================================================
+# Variable y archivos de entrada
+# ============================================================================
+var = 'pr'  # 'pr' = precipitación, 't2m' = temperatura
+outfile = '../figures/test1_pr.png'
+
+SHP_RUTA = '../input_shp'
+CSV_RUTA = '../input_csv'
+OBS_RUTA = '../data/obs_mean_files'
+NC_RUTA = '../data/mean_exp_files'
+
+files=[f'{CSV_RUTA}/{var}_all_experimentos.csv', f'{OBS_RUTA}/obs_CHIRPS.nc', 
+       f'{OBS_RUTA}/obs_CMORPH.nc', f'{OBS_RUTA}/obs_GPM.nc', f'{OBS_RUTA}/obs_PISCO.nc',
+       f'{NC_RUTA}/{var}/prom_EXP0.nc', f'{NC_RUTA}/{var}/prom_EXP1.nc', f'{NC_RUTA}/{var}/prom_EXP5.nc', 
+       f'{NC_RUTA}/{var}/prom_EXP8.nc', f'{NC_RUTA}/{var}/prom_EXP10.nc', f'{NC_RUTA}/{var}/anom_EXP1.nc',
+       f'{NC_RUTA}/{var}/anom_EXP5.nc', f'{NC_RUTA}/{var}/anom_EXP8.nc', f'{NC_RUTA}/{var}/anom_EXP10.nc',
+      ]
+
+# ============================================================================
+# Carga de shapefiles (fronteras)
+# ============================================================================
+lago = gpd.read_file(f'{SHP_RUTA}/lago_titikk_2022.shp')
+peru = gpd.read_file(f'{SHP_RUTA}/peru2.shp')
+
+
+# Etiquetas para cada subplot
+exps2 = ['Station Data', 'CHIRPS', 'CMORPH', 'GPM', 'PISCO', 'GMTs\nMOD30_SOM', 'GMTns\nMOD30_SOM', 
+         'GMTns\nEVA_SOM','GMTns\nEVA_SIE', 'GMTns\nEVA_SIE_SST','g) - f)', 'h) - g)', 'i) - h)', 'j) - i)']
+
+# ============================================================================
 # Configuración global de gráficos
 # ============================================================================
 plt.rcParams.update({'font.size': 10})
 plt.rcParams['font.family'] = 'serif'
 plt.rcParams['font.serif'] = ['Times New Roman'] + plt.rcParams['font.serif']
-
-# ============================================================================
-# Carga de shapefiles (fronteras)
-# ============================================================================
-print("Cargando shapefiles...")
-lago = gpd.read_file('/home/jonathan/SHAPE/lago_titikk_2022.shp')
-peru = gpd.read_file('/home/jonathan/SHAPE/peru2.shp')
-print("Shapefiles cargados.")
-
-# ============================================================================
-# Variable y archivos de entrada
-# ============================================================================
-var = 'pr'  # 'pr' = precipitación, 't2m' = temperatura
-files = ['../input_csv/%s_all_experimentos.csv' % var,
-         'prec_files/mon/obs_CHIRPS.nc', 'prec_files/mon/obs_CMORPH.nc',
-    'prec_files/mon/obs_GPM.nc', 'prec_files/mon/obs_PISCO.nc',
-    'nc_files/clean/%s/prom_EXP0.nc' % var, 'nc_files/clean/%s/prom_EXP1.nc' % var,
-    'nc_files/clean/%s/prom_EXP5.nc' % var, 'nc_files/clean/%s/prom_EXP8.nc' % var,
-    'nc_files/clean/%s/prom_EXP10.nc' % var,
-    'nc_files/clean/%s/anom_EXP1.nc' % var, 'nc_files/clean/%s/anom_EXP5.nc' % var,
-    'nc_files/clean/%s/anom_EXP8.nc' % var, 'nc_files/clean/%s/anom_EXP10.nc' % var
-]
-
-# Etiquetas para cada subplot
-exps2 = [
-    'Station Data', 'CHIRPS', 'CMORPH', 'GPM', 'PISCO',
-    'GMTs\nMOD30_SOM', 'GMTns\nMOD30_SOM', 'GMTns\nEVA_SOM',
-    'GMTns\nEVA_SIE', 'GMTns\nEVA_SIE_SST',
-    'g) - f)', 'h) - g)', 'i) - h)', 'j) - i)'
-]
 
 # ============================================================================
 # Funciones auxiliares
@@ -64,14 +63,14 @@ def get_cmap_norm(filepath):
     else:
         bounds = np.array([1, 2.4, 2.7, 3.0, 3.3, 3.6, 3.9, 4.2, 4.5, 4.8, 5.1, 5.4,
                            5.7, 6, 8, 10, 15, 20, 30, 40, 100])
-        cmap = plt.cm.nipy_spectral_r
         norm = mcolors.BoundaryNorm(boundaries=bounds, ncolors=256)
+        cmap = plt.cm.nipy_spectral_r
     return cmap, bounds, norm
 
 def format_axis(ax, i, j, idx, labels, titles):
     """Ajusta títulos, etiquetas y grilla de cada subplot."""
-    ax.set_title(titles[idx], loc='left', fontsize=10)
-    ax.set_title(labels[idx], loc='center', fontsize=9)
+    ax.set_title(titles[idx], loc='left', fontsize=11)
+    ax.set_title(labels[idx], loc='center', fontsize=10)
     ax.set_yticks([-17, -16, -15])
     ax.set_xticks([-70, -69])
     ax.grid(lw=0.8, ls=':', c='gray')
@@ -90,7 +89,7 @@ def format_axis(ax, i, j, idx, labels, titles):
 # Creación de figura con GridSpec
 # ============================================================================
 print("Generando figura...")
-fig = plt.figure(figsize=(12, 9))
+fig = plt.figure(figsize=(10, 7.5))
 gs = gridspec.GridSpec(3, 5, figure=fig, wspace=0.05, hspace=0.04)
 titles = [chr(97 + i) + ")" for i in range(24)]  # a), b), c)...
 
@@ -104,25 +103,20 @@ for i in range(3):
         # Leer datos según el índice
         file = files[idx]
         print(f"  Procesando {file}...")
-        
+        cmap, bounds, norm = get_cmap_norm(file)
         if idx == 0:
             # Datos de estaciones (CSV)
             df = pd.read_csv(file)
-            lons, lats, precs = df["lon"], df["lat"], df[var]
-            cmap, bounds, norm = get_cmap_norm(file)
-            sc = ax.scatter(lons, lats, c=precs, cmap=cmap, norm=norm,
-                            ec="k", s=60, lw=0.4)
+            lons, lats, precs = df["lon"], df["lat"], df[var]            
+            sc = ax.scatter(lons, lats, c=precs, cmap=cmap, norm=norm,  ec="k", s=60, lw=0.4)
             im = sc  # para referencia de colorbar
         else:
             # Datos NetCDF
-            ds = xr.open_dataset(file)[var]
-            cmap, bounds, norm = get_cmap_norm(file)
+            ds = xr.open_dataset(file)[var]            
             if 'anom' in file:
-                im = ds.plot(ax=ax, cmap=cmap, levels=bounds,
-                             add_colorbar=False, extend='both')
+                im_anom = ds.plot(ax=ax, cmap=cmap, levels=bounds, add_colorbar=False, extend='both')
             else:
-                im = ds.plot(ax=ax, cmap=cmap, norm=norm,
-                             add_colorbar=False, extend='both')
+                im = ds.plot(ax=ax, cmap=cmap, norm=norm, add_colorbar=False, extend='both')
         
         # Agregar barras de color en posiciones específicas
         if (i, j) == (1, 4):
@@ -131,7 +125,7 @@ for i in range(3):
                                 label="[mm/day]", extend='both')
         if (i, j) == (2, 4):
             cax = fig.add_axes([0.91, 0.14, 0.02, 0.18])
-            cbar = fig.colorbar(im, cax=cax, ticks=bounds[1:-1:2],
+            cbar = fig.colorbar(im_anom, cax=cax, ticks=bounds[1:-1:2],
                                 label="[mm/day]", extend='both')
         
         # Dibujar fronteras y ajustar límites
@@ -143,8 +137,7 @@ for i in range(3):
         idx += 1
 
 # Guardar y mostrar
-outfile = 'out/test_pr.png'
 plt.savefig(outfile, dpi=100, bbox_inches='tight')
 print(f"Figura guardada en {outfile}")
 plt.close()
-print("Proceso completado.")
+print("DONE! figura 6-7 creada")
