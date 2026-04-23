@@ -1,5 +1,4 @@
 #!/usr/bin/python
-# Este archivo va en: src/
 # Ejecutar con: from aux_topo import *
 
 from aux_topo_plot import *
