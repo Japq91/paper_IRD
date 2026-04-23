@@ -1,0 +1,11 @@
+# datos pesados — no versionar
+# input_nc/**/*.nc
+*nc
+
+# figuras generadas — opcional
+# figures/
+
+# archivos temporales Python
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
