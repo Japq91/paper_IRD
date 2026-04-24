@@ -19,7 +19,7 @@ EXPERIMENTOS = [0, 1, 5, 8, 10] # IDs de los experimentos WRF
 
 # Rutas (usando pathlib para compatibilidad entre SO)
 RUTA_NC = Path('../data/nc_files')                # Archivos NetCDF originales
-RUTA_SALIDA = Path(f'../data/mean_anom_files/{VAR}') # Donde guardar medias y anomalías
+RUTA_SALIDA = Path(f'../data/exp_mean_files/{VAR}') # Donde guardar medias y anomalías
 
 # Crear directorio de salida si no existe
 RUTA_SALIDA.mkdir(parents=True, exist_ok=True)
