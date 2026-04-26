@@ -1,5 +1,3 @@
-#!/usr/bin/python
-
 import warnings
 warnings.filterwarnings("ignore")
 import pandas as pd
@@ -12,18 +10,9 @@ from cartopy.io.shapereader import Reader
 from matplotlib.gridspec import GridSpec
 import matplotlib.patches as patches
 
-# --- CONFIGURACIÓN ESTÉTICA ---
-plt.rcParams.update({'font.size': 10, 'font.family': 'serif'})
-plt.rcParams['font.serif'] = ['Times New Roman'] + plt.rcParams['font.serif']
-
 # --- RUTAS ---
-ri = '/home/jap/IRD/OVAR'
-shapes_r = '/home/jap/SHAPES'
-DIR_NC = f'{ri}/clean'
-OUT_DIR = f'{ri}/out'
-
-DIR_SHAPES = '../input_shp'
-DIR_DATA = '../data/lago_files'
+shapes_r = '../input_shp'
+DIR_NC = '../data/sst_files'
 OUT_DIR = '../figures'
 
 # Recursos cartográficos
@@ -31,6 +20,9 @@ LAGO = Reader(f'{shapes_r}/lago_titikk_2022.shp')
 PERU = Reader(f'{shapes_r}/peru2.shp')
 CRS = ccrs.PlateCarree()
 XTICKS, YTICS = np.arange(-77, -64.5, 1), np.arange(-23, -10, 1)
+# --- CONFIGURACIÓN ESTÉTICA ---
+plt.rcParams.update({'font.size': 10, 'font.family': 'serif'})
+plt.rcParams['font.serif'] = ['Times New Roman'] + plt.rcParams['font.serif']
 
 # --- FUNCIONES ---
 
@@ -41,10 +33,10 @@ def agrega_grid(ax, i, j, numcol, numrow):
     grd.top_labels = grd.right_labels = False
     grd.left_labels = (i == 0)
     grd.bottom_labels = (j == numrow - 1)
-
+    
 def add_cuadrado(ax):
     """ Resalta el área de estudio con un cuadro punteado. """
-    square = patches.Rectangle((-69.7, -16), 0.4, 0.5, edgecolor='k', 
+    square = patches.Rectangle((-69.7, -16), -0.4, 0.5, edgecolor='k', 
                                facecolor='none', lw=1.5, ls='--', zorder=5)
     ax.add_patch(square)
 
@@ -68,10 +60,11 @@ def paso_1(data, ax, var, tipo):
     ax.set_extent([-70.7, -68.3, -17, -14.7]) 
     return im
 
+
 # --- EJECUCIÓN DEL PLOT ---
 
 fig = plt.figure(figsize=(12, 10))
-gs = GridSpec(nrows=3, ncols=3, hspace=0.3, wspace=0.2)
+gs = GridSpec(nrows=3, ncols=3, hspace=0.1, wspace=0.1)
 lplt3 = ['a)', 'b)', 'c)', 'd)', 'e)', 'f)', 'g)', 'h)', 'i)']
 n = 0
 
@@ -105,8 +98,8 @@ for j, var_name in enumerate(['LH', 'HFX', 'ALBEDO']):
             
             if i == 0:
                 row_labels = {'LH': 'Latent Heat (W/m²)', 'HFX': 'Sensible Heat (W/m²)', 'ALBEDO': 'ALBEDO'}
-                ax.text(-71.1, -15.85, row_labels[var_name], rotation=90, 
-                        va='center', fontweight='bold', fontsize=11)
+                ax.text(-71.4, -15.85, row_labels[var_name], rotation=90, 
+                        va='center', fontsize=11) #, fontweight='bold'
 
             agrega_grid(ax, i, j, 3, 3)
             add_cuadrado(ax)
@@ -116,5 +109,5 @@ for j, var_name in enumerate(['LH', 'HFX', 'ALBEDO']):
             print(f"Archivo no encontrado: {path_nc}")
 
 # Guardado final
-fig.savefig(f'{OUT_DIR}/v3_9plots_final.png', dpi=400, bbox_inches='tight')
-plt.show()
+fig.savefig(f'{OUT_DIR}/sst_plot.png', dpi=100, bbox_inches='tight')
+plt.close()
