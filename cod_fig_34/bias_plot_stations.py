@@ -29,7 +29,7 @@ YTICKS  = np.arange(-23, -10, 1)
 ############################################################
 META = {
     't2m': dict(name='Surface temperature', vmax=3, scale=1.5, unit='[°C]',  ylim=(-4,  2)),
-    'pr':  dict(name='Precipitation',       vmax=5, scale=1.0, unit='[mm/day]', ylim=(-4, 8)),
+    'pr':  dict(name='Precipitation',       vmax=100, scale=0.034, unit='[%]', ylim=(-50, 200)),
 }
 m = META[VAR]
 ############################################################
@@ -48,7 +48,7 @@ PANEL_LABELS = list('abcdefghijkl')   # 'a)' … 'l)'
 # ─── figura principal ─────────────────────────────────────────────────────────
 
 df = pd.read_csv(f'{ROOT}data/csv_files/{VAR}_dif_AllStation.csv', index_col=0)
-
+if 'pr' in VAR: df = bias_percentage(df, VAR)
 fig = plt.figure(figsize=(12, 9))
 fig.suptitle(f'{m["name"]} biases', fontsize=16,)
 gs = GridSpec(nrows=NUMROW, ncols=NUMCOL, hspace=0.095, wspace=0.05)
@@ -61,28 +61,35 @@ for k, (exp_id, label, panel) in enumerate(zip(EXP_IDS, EXP_LABELS, PANEL_LABELS
     if i == 1 and j == NUMROW - 1:
         ax = fig.add_subplot(gs[j, i:])
         plot_boxplot_panel(ax, ROOT, VAR, EXP_LABELS_boxplot[:-1])
-
     else:
         ax = fig.add_subplot(gs[j, i], projection=CRS)
-        neg, pos = plot_mapa(ax, df, exp_id, m['scale'], m['vmax'], SHAPES)
+        # Llamada a plot_mapa con o sin step según la variable
+        if VAR == 'pr':
+            neg, pos = plot_mapa(ax, df, exp_id, m['scale'], m['vmax'], SHAPES,
+                                 clip_range=(-100, 100), step=10)   # ← barra discreta cada 10
+        else:
+            neg, pos = plot_mapa(ax, df, exp_id, m['scale'], m['vmax'], SHAPES,
+                                 clip_range=None, step=None)
         setup_axes(ax, i, j, NUMROW, XTICKS, YTICKS)
 
-        if neg is not None:             # solo sobreescribe si hay datos reales
+        if neg is not None:
             sc_neg, sc_pos = neg, pos
 
         if i == 0 and j == NUMROW - 1:
-            ax.text(-56.5, -10.6 if 't' in VAR else -11.1,
+            ax.text(-56.5, -10.6 if 't' in VAR else -10.6,
                     m['unit'], rotation='vertical')
-
+   
     ax.set_title(label,       loc='center')
     ax.set_title(f'{panel})', loc='left')
+
 ############################################################
 # colorbars — solo si al menos un panel tuvo datos
 if sc_neg is not None:
-    cbar_neg = fig.add_axes([0.91, 0.50, 0.03, 0.15])
-    cbar_pos = fig.add_axes([0.91, 0.65, 0.03, 0.15])
+    cbar_neg = fig.add_axes([0.91, 0.50, 0.024, 0.15])
+    cbar_pos = fig.add_axes([0.91, 0.65, 0.024, 0.15])
     fig.colorbar(sc_neg, cax=cbar_neg, extend='neither', spacing='proportional')
     fig.colorbar(sc_pos, cax=cbar_pos, extend='neither', spacing='proportional')
+
 print("DONE! figura creada")
-plt.savefig(f'{ROOT}figures/general_dif_{VAR}.jpg', dpi=100, bbox_inches='tight')
+plt.savefig(f'{ROOT}figures/fig34_{VAR}.jpg', dpi=150, bbox_inches='tight')
 plt.close()
